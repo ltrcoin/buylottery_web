@@ -13,7 +13,7 @@ use App\Http\Models\Frontend\WinningNumber;
 use App\Http\Models\Frontend\Winner;
 use App\Http\Models\Frontend\Prize;
 use GuzzleHttp\Client;
-use Illuminate\Config\Repository;
+
 
 class SiteController extends Controller
 {
@@ -115,7 +115,7 @@ public function ltraddress($email, $password)
              'form_params' => [
                 'email'=>$email,
                 'password'=>$password,               
-                'identity'=> Config::get('constants.LTRWALLET_API_KEY')
+                'identity'=> 'laksjdajpwamdlni12312914!@)#$!&@)*8ascijasnkc*!@&$@!)*&$!)@$&'
                 ]
             ]);
 
