@@ -114,7 +114,7 @@ public function ltraddress($email, $password)
              'form_params' => [
                 'email'=>$email,
                 'password'=>$password,               
-                'identity'=> Config::get('constants.LTRWALLET_API_KEY');
+                'identity'=> Config::get('constants.LTRWALLET_API_KEY')
                 ]
             ]);
 
