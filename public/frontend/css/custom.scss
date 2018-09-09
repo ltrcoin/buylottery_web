@@ -1,0 +1,151 @@
+/**
+HOME PAGE
+ */
+
+.item.game-item-owl {
+  text-align: center;
+  h4 {
+    margin: 14px 0;
+  }
+  .btn {
+    display: block;
+    margin: 6px auto;
+  }
+}
+
+/**
+Play game
+ */
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  @media (max-width: 767px) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  h4 {
+    margin: 0;
+    padding: 0 15px;
+    @media (max-width: 767px) {
+      width: 100%;
+      text-align: center;
+      margin: 15px 0;
+    }
+  }
+  img {
+    max-height: 100px;
+  }
+  .draw-time {
+    .count-down-draw {
+      margin-left: 6px;
+      font-weight: bold;
+    }
+  }
+}
+
+.one-ticket {
+  margin-bottom: 15px;
+  @media (max-width: 639px) {
+    width: 100%;
+  }
+}
+
+.ticket-pick {
+  background-color: #edf3ff;
+  padding: 15px;
+  border-radius: 15px;
+  .fa {
+    display: none;
+  }
+  &.valid-ticket {
+    background-color: rgba(139, 195, 74, 0.35) !important;
+    .fa {
+      display: block;
+      background-color: #fff;
+      border-radius: 15px;
+      padding: 3px;
+      color: #478e00;
+      transform: scale(1.2);
+      position: absolute;
+      top: -10px;
+      right: 3px;
+      border: 3px solid #d6ebc1;
+    }
+  }
+  &:hover {
+    -webkit-box-shadow: 1px 1px 3px 3px #ccc;
+    -moz-box-shadow: 1px 1px 3px 3px #ccc;
+    box-shadow: 1px 1px 3px 3px #ccc;
+    background-color: #fcf8e3;
+    -webkit-transform: scale(1.02);
+    -moz-transform: scale(1.02);
+    -ms-transform: scale(1.02);
+    -o-transform: scale(1.02);
+    transform: scale(1.02);
+  }
+  .normal-num, .special-num {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .normal-num {
+    margin-bottom: 15px;
+  }
+  .numbers-to-pick {
+    text-align: center;
+    border-bottom: 1px solid #bfbfbf;
+    margin-bottom: 6px;
+  }
+  .a-number, .a-special-num {
+    width: 28px;
+    height: 28px;
+    padding: 3px;
+    margin: 3px;
+    text-align: center;
+    border: 1px solid #bfbfbf;
+    cursor: pointer;
+  }
+  .a-number {
+    background-color: #fee11b;
+    &.picked {
+      background-color: #2873f0;
+      color: #fff;
+    }
+  }
+  .a-special-num {
+    background-color: #ffbd5a;
+    &.picked {
+      background-color: #ff2121;
+      color: #fff;
+    }
+  }
+}
+
+.price-area {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #edf3ff;
+  border-radius: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .total-ticket-price {
+    font-weight: bold;
+    margin-left: 6px;
+  }
+}
+
+.select-lines {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  .btn {
+    margin-bottom: 3px;
+    padding: 5px 10px;
+  }
+  span {
+    color: #007be9;
+    cursor: pointer;
+  }
+}

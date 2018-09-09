@@ -1,0 +1,92 @@
+/*
+* @Author: KEN
+* @Date:   2017-04-14 14:17:40
+* @Last Modified by:   KEN
+* @Last Modified time: 2018-06-03 12:15:07
+*/
+.wrapper {
+  overflow: initial;
+}
+.mrg-10{
+	margin: 10px;
+}
+table.dataTable thead > tr > th, table.dataTable tbody > tr > td, table#tbl-permission tr td{
+    vertical-align: middle;
+}
+table.dataTable thead > tr > th, table.dataTable thead > tr > th, table.dataTable tbody > tr > td:first-child{
+    text-align: center !important;
+}
+.table-bordered tbody > tr > td {
+	border: 1px solid #ddd;
+}
+.table-bordered div.form-group, .table-bordered label {
+	margin-bottom: 0;
+}
+table.dataTable thead > tr > th{
+	background-color: #3c8dbc;
+	color: #fff;
+	padding-right: 8px !important;
+}
+ul#menuweb li span, ul#menuweb li a {
+    text-transform: uppercase;
+}
+.nav-tabs>li.active a, .nav-tabs>li.active:hover a, .nav-tabs>li:hover a {
+    border-top: 3px solid #3c8dbc;
+    background: #fff;
+}
+.search-form > div.input-group {width: 100%;}
+.ui-autocomplete .ui-menu-item, 
+.ui-autocomplete .ui-menu-item:focus, 
+.ui-autocomplete .ui-menu-item:hover {
+	height: 34px !important;
+	line-height: 34px !important;
+	padding-left: 5px !important;
+	margin: 0;
+}
+.odd{
+	
+}
+.even{
+
+}
+.deleteItem{
+	color: #d73925;
+}
+.deleteItem:hover{
+	color: #d73925;
+	opacity: 0.7;
+}
+.required::after{
+	content: " *";
+	color: #f00;
+}
+.help{
+	font-size: 16px;
+	font-style: italic;
+}
+.has-error .checkbox, .has-error .checkbox-inline, .has-error .control-label, .has-error .help-block, .has-error .radio, .has-error .radio-inline, .has-error.checkbox label, .has-error.checkbox-inline label, .has-error.radio label, .has-error.radio-inline label{ color: #f00; }
+/*#main-content{min-height: 680px !important}*/
+.note-editable.panel-body .table-bordered>tbody>tr>td, .table-bordered>tbody>tr>th, .table-bordered>tfoot>tr>td, .table-bordered>tfoot>tr>th, .table-bordered>thead>tr>td, .table-bordered>thead>tr>th {
+    border: 1px solid #ddd !important;
+}
+.icheckbox_flat-green{
+	position: relative;
+}
+.flat-red{
+	position: absolute; 
+	opacity: 0;
+}
+.iCheck-helper{
+	position: absolute; 
+	top: 0%; 
+	left: 0%; 
+	display: block; 
+	width: 100%; 
+	height: 100%; 
+	margin: 0px; 
+	padding: 0px; 
+	background: rgb(255, 255, 255); 
+	border: 0px; 
+	opacity: 0;
+}
+.viewItem{cursor: pointer;}

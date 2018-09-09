@@ -1,0 +1,65 @@
+.game-mega-million {
+    background-image: url(../../icon/sprite01.png);
+    background-position: 585px 0px;
+    width: 117px;
+    height: 65px;
+    margin: auto;
+}
+.game-jackpot-euro {
+    background-image: url(../../icon/sprite01.png);
+    background-position: 1053px 0px;
+    width: 117px;
+    height: 65px;
+    margin: auto;
+}
+.owl-carousel .owl-stage-outer .owl-stage {
+	margin: auto !important;
+}
+.owl-carousel .owl-stage-outer .owl-stage .owl-item {
+	background: #fecc45;
+}
+.owl-carousel .owl-stage-outer .owl-stage .owl-item .btn:hover {
+    background: #ff6f23 none repeat scroll 0 0;
+    border-color: #ff6f23;
+    color: #fff;
+}
+.color-red {color: #FC000C;}
+.rs-section hr.lg{margin: 22px 0;}
+.rs-section .hr-item:last-child {display: none;}
+section {padding-top: 50px; padding-bottom: 50px;}
+.rs-number{
+    font-size: 18px;
+    color: #000;
+    border-radius: 50%;
+    border: #2874f0 solid 2px;
+    margin-right: 5px;
+    font-weight: bold;
+    height: 40px;
+    width: 40px;
+    display: inline-block;
+    text-align: center;
+    line-height: 35px;
+}
+.rs-number.special{
+    color: #f00;
+    border-color: #f00;
+}
+.pd-0{padding: 0 !important;}
+.mrg-t-10 {margin-top: 10px;}
+.mrg-bt-10 {margin-bottom: 10px;}
+.mrg-bt-15 {margin-bottom: 15px;}
+.lottery-results .cart_table_item:first-child td{
+    border-top: none;
+}
+.img-box-banner img {min-width: 263px; min-height: 298px;}
+.game-item-owl .img {
+    width: 263px;
+    height: 185px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+.game-item-owl .img img {
+    max-width: 263px;
+    max-height: 185px;
+    margin: auto;
+}

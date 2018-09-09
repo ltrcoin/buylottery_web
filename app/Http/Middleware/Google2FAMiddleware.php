@@ -1,0 +1,28 @@
+<?php
+ 
+namespace App\Http\Middleware;
+ 
+use App\Http\Google2FAAuthenticator;
+use Closure;
+ 
+class Google2FAMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @return mixed
+     */
+    public function handle($request, Closure $next)
+    {
+        $authenticator = app(Google2FAAuthenticator::class)->boot($request);
+ 
+        if ($authenticator->isAuthenticated()) {
+            return $next($request);
+            //return redirect()->route('frontend.site.index');
+        }
+ 
+        return $authenticator->makeRequestOneTimePasswordResponse();
+    }
+}
