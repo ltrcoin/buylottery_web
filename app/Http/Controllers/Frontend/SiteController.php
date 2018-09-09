@@ -13,6 +13,7 @@ use App\Http\Models\Frontend\WinningNumber;
 use App\Http\Models\Frontend\Winner;
 use App\Http\Models\Frontend\Prize;
 use GuzzleHttp\Client;
+use Illuminate\Config\Repository;
 
 class SiteController extends Controller
 {
