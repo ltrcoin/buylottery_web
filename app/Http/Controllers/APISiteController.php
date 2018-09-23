@@ -13,6 +13,8 @@ use App\Http\Models\Frontend\WinningNumber;
 use App\Http\Models\Frontend\Winner;
 use App\Http\Models\Frontend\Prize;
 use GuzzleHttp\Client;
+use App\Http\Controllers\Frontend\SiteController;
+use Illuminate\Support\Facades\Storage;
 
 class APISiteController extends Controller
 {
@@ -156,67 +158,64 @@ class APISiteController extends Controller
 
 //--- end of api login
 
+//------------------api Register
+  
+ public function apiregister(Request $request) 
+    {
+        $customer = new Customer();
 
+        $customer->fullname = $request->email;
+        $customer->email = $request->password;
 
-    public function register(Request $request) {
-        if ($request->isMethod('post')) {
-            /*validate data request*/
-            Validator::make($request->all(), [
-                'fullname' => 'required|max:255',
-                'email' => 'required|email|unique:customers|max:255',
-                'tel' => 'required|unique:customers|max:50',
-                'wallet_btc' => 'required|unique:customers|max:150',
-                'country' => 'required',
-                'address' => 'max:255',
-                /*'portraitimage' => 'required',
-                'passportimage' => 'required',*/
-                'password' => 'required|max:255',
-                're_password' => 'required|max:255|same:password'
-            ])->setAttributeNames([
-                'fullname' => 'Full Name',
-                'email' => 'Email',
-                'tel' => 'Phone',
-                'wallet_btc' => 'Wallet BTC',
-                'country' => 'Country',
-                'address' => 'Address',
-                /*'portraitimage' => 'Portrait image',
-                'passportimage' => 'Passport image',*/
-                'password' => 'Password',
-                're_password' => 'Confirm password'
-            ])->validate();
-            $customer = new Customer();
+       $apikey=$request->apikey;    
+       
+       if (!($apikey== env('ONESIGNAL_API_KEY'))) {
+            return response()->json([
+                                    'status'=>422,
+                                    'msg'=>'Invalid API Key',
+                                    'data'=>[]
+                                    ]);
+        }; 
+
+   
+
             $customer->fullname = $request->fullname;
             $customer->email = $request->email;
+            $customer->password = bcrypt($request->password);
             $customer->tel = $request->tel;
-            $customer->wallet_btc = $request->wallet_btc;
-            $customer->dob = $request->dob;
-            $customer->sex = $request->sex;
-            $customer->country = $request->country;
+            $customer->wallet_btc=$request->wallet_btc;
+            //$customer->wallet_ltr=SiteController::ltraddress($customer->email, $customer->password);
+        
+            $customer->wallet_ltr='test upload $requets';
+            
+           
+            $customer->dob = Carbon::parse($request->dob)->format('Y-m-d');
+
+            $customer->sex = intval($request->sex);
+            $customer->country =intval($request->country);
             $customer->address = $request->address;
             $customer->status = Customer::STATUS_ACTIVE;
-            $customer->password = bcrypt($request->password);
-            /*upload file to public/upload/profile*/
-            if ($request->hasFile('portraitimage')) {
-                $path = $request->file('portraitimage')->store(
-                    'profile/'.$request->email.date("Y",time()).'/'.date("m",time()).'/'.date("d",time()), 'upload'
-                );
-                $customer->portraitimage = 'upload/'.$path;
-            }
-            /*upload file to public/upload/profile*/
-            if ($request->hasFile('passportimage')) {
-                $path = $request->file('passportimage')->store(
-                    'profile/'.$request->email.date("Y",time()).'/'.date("m",time()).'/'.date("d",time()), 'upload'
-                );
-                $customer->passportimage = 'upload/'.$path;
-            }
-            $customer->save();
-            \Session::put('2fa:isLogged', $customer);
-            return redirect()->route('frontend.ps.show2faForm');
-        }
-        $data['listGender'] = Customer::$SEX;
-        $data['listCountry'] = Customer::$COUNTRY;
-        return view('frontend.site.register', $data);
+
+    
+       $customer->save();
+
+
+     
+       return response()->json([
+                               'status'=>200,
+                               'msg'=>'Register successfully',
+                               'data'=>[
+				   'wallet_ltr'=>$customer->wallet_ltr
+]
+                               ]);
+           
+          
     }
+
+//--- end of api Register
+
+
+
 
     public function validateAjax(Request $request) {
         $validator = Validator::make($request->all(), [

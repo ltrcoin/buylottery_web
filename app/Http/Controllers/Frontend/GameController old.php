@@ -12,8 +12,6 @@ use Illuminate\Support\Facades\Auth;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
-
 
 class GameController extends Controller
 {
@@ -322,29 +320,23 @@ for($i=0; $i<$ticketslen; $i++)
 		}
 		error_log('Total Cost for check out la:'.$totalCost);
 		// Check LTR first
-		if ($ltr_balance < $totalCost) {  //-----
+		if ($ltr_balance < $totalCost) {
 			$ltr_more=$totalCost-$ltr_balance;
 			$request->session()->forget( '_cart' );
 			return view('frontend.game.buy_more_ltr',['ltr_more'=>$ltr_more] );
 		}
 		// Check ETH Also
 
-		if ($eth_balance < $mingas) { //----
+		if ($eth_balance < $mingas) {
 			$eth_more=$mingas-$eth_balance;
 			$request->session()->forget( '_cart' );
 			return view('frontend.game.buy_more_eth',['eth_more'=>$eth_more] );
 		}
 		 		
 		
-		$currenLTRUSDrate=0.001; // Get this rate online via a function
-		$receiptArray=[];
-
+		$tickets = [];
 
 		foreach ( $games as $game ) {
-
-			$tickets = [];
-
-
 			foreach ( $game['tickets'] as $ticket ) {
 				if (!($ticket['normal']==null)) { 
 					//print_r($ticket['normal']);
@@ -360,33 +352,26 @@ for($i=0; $i<$ticketslen; $i++)
 
 				}
 			}
-			
-			$numberOfTickets=count($tickets);
-			$typePrizeID=$this->transFormGameIDToString($tickets);
-			$valueUSD=$game['cost']*$currenLTRUSDrate; 
-			$message=$this->transFormTicketsToString($tickets);
-			$buyFrom='buylottery';        
-
-			$receipt=$this->buyNow($request, $typePrizeID, $valueUSD ,$message ,$buyFrom);
-		 	/*$receipt=[
-		 		"TxHash"=>'0x-'.$message,
-		 		'LTRValue'=>$game['cost']
-		 	];*/
-		 	
-		 	$receiptArray[]=$receipt;
-			Ticket::insert( $tickets );
-
 		}
+		 
+		$currenLTRUSDrate=0.001; // Get this rate online via a function
+		$numberOfTickets=count($tickets);
+		
+		$typePrizeID=$this->transFormGameIDToString($tickets);
+        $valueUSD=$totalCost*$currenLTRUSDrate; 
+        $message=$this->transFormTicketsToString($tickets);
+        $buyFrom='buylottery';
 
+		$receipt=$this->buyNow($request, $typePrizeID, $valueUSD ,$message ,$buyFrom);	
+		 
+		Ticket::insert( $tickets );
 
 		$request->session()->forget( '_cart' );
 
 		return view('frontend.game.success_checkout',[
-			'count'=>count($receiptArray),
-			'receiptArray'=>$receiptArray
+			'txhash'=>$receipt['TxHash'],
+			'ltrvalue'=>$receipt['LTRValue']
 		]);
-
-		
 	}
 	}
 }

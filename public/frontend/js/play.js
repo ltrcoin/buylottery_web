@@ -92,7 +92,7 @@ $(function () {
     </div>
     <div class="price-area col-md-12">
         <p class="ticket-price">Ticket Price ({{ lines.length }} x {{ ticket_price }} LTR): <span class="total-ticket-price">{{ lines.length * ticket_price }}</span> LTR</p>
-        <button class="btn btn-submit-ticket">Play</button>
+        <button class="btn btn-submit-ticket">Play Game</button>
     </div>
     `,
     data: {

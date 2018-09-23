@@ -33,4 +33,17 @@ Route::get('/login', function (Request $request) {
     		]);
 });
 	
-			
+Route::post('/register', [
+            'as' => 'frontend.site.vapiregister',
+            'uses'  => 'APISiteController@apiregister'
+        ]);
+
+Route::get('/register', function (Request $request) {
+    return response()->json([
+            'status'=>422,
+            'msg'=>'Get method refused',
+            'data'=>[]
+            ]);
+});
+    
+            

@@ -13,6 +13,9 @@ use App\Http\Models\Frontend\WinningNumber;
 use App\Http\Models\Frontend\Winner;
 use App\Http\Models\Frontend\Prize;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 
 
 class SiteController extends Controller
@@ -86,10 +89,21 @@ class SiteController extends Controller
             $customer = Customer::where($credentials)->firstOrFail();
             if(\Hash::check($request->password, $customer->password)) {
                 \Session::put('2fa:isLogged', $customer);
+
                 if(!isset($customer->passwordSecurity) || !$customer->passwordSecurity->google2fa_enable) {
-                    return redirect()->route('frontend.ps.show2faForm');
+                	//-----login without 2fa if 2fa is disable
+                	$user = Customer::find(\Session::get('2fa:isLogged')->id);
+                	Auth::guard('web')->loginUsingId($user->id);
+                	 //\Session::forget('2fa:isLogged');
+                    return redirect()->route('frontend.site.index');
+                 	//-----
+                    //return redirect()->route('frontend.ps.show2faForm');
                 } else {
                     return redirect()->route('frontend.ps.verify2fa');
+                    //-------------change 2392018
+                    /*$user = Customer::find(\Session::get('2fa:isLogged')->id);
+                	Auth::guard('web')->loginUsingId($user->id);
+                    return redirect()->route('frontend.site.index');*/
                 }
             } else {
                 return redirect()->route('frontend.site.vLogin')->withErrors("Email or password incorrect!");
@@ -102,7 +116,7 @@ class SiteController extends Controller
 //-----Return LTR Wallet address string when a customer sign up. 
 //     Return 'error'. password if there is error
 
-public function ltraddress($email, $password) 
+public static function ltraddress($email, $password) 
     {       
         //-----step 1 -- sign up
 
@@ -119,7 +133,26 @@ public function ltraddress($email, $password)
                 ]
             ]);
 
-          $response1 = $client1->request('POST'); // Catch exception guzzle 
+        
+		try {
+		   $response1 = $client1->request('POST'); 
+		}
+		catch (RequestException $e) {
+		    return 'RequesException'.Carbon::now();
+		}
+
+		 catch (ClientException $e) {
+		 	return 'ClientException'.Carbon::now();
+		}
+		 catch (ConnectException $e) {
+		 	return 'ConnectException'.Carbon::now();
+		}
+
+		   
+		
+
+		
+
           $body1 = $response1->getBody();
           error_log($body1);
           $json1 = json_decode($body1, true);
@@ -212,12 +245,15 @@ public function ltraddress($email, $password)
                 're_password' => 'Confirm password'
             ])->validate();
             $customer = new Customer();
+
             $customer->fullname = $request->fullname;
             $customer->email = $request->email;
             $customer->password = bcrypt($request->password);
             $customer->tel = $request->tel;
             $customer->wallet_btc=$request->wallet_btc;
             $customer->wallet_ltr=$this->ltraddress($customer->email, $customer->password);
+            
+//$customer->wallet_ltr='test upload';
             //------Call function to genrate LTR Wallet and save it to wallet_ltr
             //$customer->wallet_ltr = $this->ltraddress($customer->email, $customer->password);
 
@@ -225,6 +261,8 @@ public function ltraddress($email, $password)
 
             //------
             $customer->dob = $request->dob;
+            
+
             $customer->sex = $request->sex;
             $customer->country = $request->country;
             $customer->address = $request->address;
@@ -246,8 +284,9 @@ public function ltraddress($email, $password)
             }
             $customer->save();
             
-            \Session::put('2fa:isLogged', $customer);
-            return redirect()->route('frontend.ps.show2faForm');
+            //\Session::put('2fa:isLogged', $customer);
+            //------------chuyen ve trang login la chuan nhat... 
+            return view('frontend.site.login');
         }
         $data['listGender'] = Customer::$SEX;
         $data['listCountry'] = Customer::$COUNTRY;

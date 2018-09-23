@@ -23,9 +23,9 @@
                            <form class="form-horizontal" action="{{ route('frontend.ps.pverify2fa') }}" method="POST">
                                {{ csrf_field() }}
                                <div class="form-group{{ $errors->has('one_time_password-code') ? ' has-error' : '' }}">
-                                   <label for="one_time_password" class="col-md-4 control-label">One Time Password</label>
+                                   <label for="one_time_password" class="col-md-4 control-label">One 1  Time Password</label>
                                    <div class="col-md-6">
-                                       <input name="one_time_password" class="form-control"  type="text"/>
+                                       <input name="one_time_password" class="form-control"  type="text" required />
                                    </div>
                                </div>
                                <div class="form-group">

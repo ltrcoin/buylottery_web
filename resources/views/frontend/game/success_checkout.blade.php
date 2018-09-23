@@ -13,7 +13,16 @@
                     </div>
                     <div class="alert alert-success" role="alert">
                         <p>{{ __('label.checkout.success') }}</p>
+                        <p> Save Transaction Hash and check it on EtherScanIO</p>
+                        @for ($i = 0; $i < $count; $i++)
+                            <p>You spent: {{ $receiptArray[$i]['LTRValue'] }} LTR on this transaction:
+                            <a href="https://etherscan.io/tx/{{$receiptArray[$i]['TxHash']}}">{{$receiptArray[$i]['TxHash'] }}</a>                         
+
+                            </p>      
+                        @endfor
+                        
                     </div>
+
                 </div>
             </div>
         </div>

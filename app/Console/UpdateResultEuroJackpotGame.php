@@ -108,6 +108,8 @@ class UpdateResultEuroJackpotGame extends Command
                     'results' => explode(',', $body_jackpot->results),
                     'draw' => $body_jackpot->draw
                 ];
+                error_log('Get gew result for EuroJackpot:');
+                error_log($data);
 	        }
 	    } catch(Exception $e) {
 	    	$data = [];

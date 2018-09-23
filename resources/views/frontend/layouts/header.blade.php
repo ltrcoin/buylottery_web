@@ -200,6 +200,7 @@
                             <li><a href="{{route('frontend.account.transaction')}}">Transaction history</a></li>
                             <li><a href="{{route('frontend.account.win')}}">Wins history</a></li>
                             <li><a href="{{route('frontend.account.profile')}}">Profile</a></li>
+                            <li><a href="{{route('frontend.ps.2fasetting')}}">2fa Verification</a></li>
                         </ul>
                     </li>
                     @endif

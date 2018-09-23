@@ -118,6 +118,8 @@ class UpdateResultMegaMillionGame extends Command
                     'results' => explode(',',$body_mega->results),
                     'draw' => $body_mega->draw
                 ];
+                error_log('Get gew result for MegaMillion:');
+                error_log($data);
 	        }
 	    } catch(Exception $e) {
 	    	$data = [];

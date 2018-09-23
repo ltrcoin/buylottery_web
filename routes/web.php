@@ -77,6 +77,13 @@ Route::group(['middleware'=>'guest.2fa'],
 
 Route::group(['middleware'=>['auth.web', '2fa']],
 	function() {
+		
+		Route::get('/2fasetting', [
+			'as' => 'frontend.ps.2fasetting',
+			'uses' => 'PasswordSecurityController@secondfasetting'
+		]);
+
+
 		Route::get('/disable2fa', [
 			'as' => 'frontend.ps.disable2fa',
 			'uses' => 'PasswordSecurityController@disable2fa'
@@ -85,6 +92,21 @@ Route::group(['middleware'=>['auth.web', '2fa']],
 			'as' => 'frontend.ps.pdisable2fa',
 			'uses' => 'PasswordSecurityController@disable2fa'
 		]);
+		 //----
+		 Route::get('/enable2fa', [
+			'as' => 'frontend.ps.enable2fa',
+			'uses' => 'PasswordSecurityController@g_enable2fa'
+		]);
+		 Route::post('/enable2fa', [
+			'as' => 'frontend.ps.g_enable2fa',
+			'uses' => 'PasswordSecurityController@h_enable2fa'
+		]);
+		 Route::post('/generate2faSecret2', [
+			'as' => 'frontend.ps.g_generate2faSecret',
+			'uses' => 'PasswordSecurityController@generate2faSecret'
+		]);
+		
+		 //---
 		Route::get('/logout', [
 			'as' => 'frontend.site.logout',
 			'uses' => 'SiteController@logout'

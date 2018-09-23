@@ -66,9 +66,15 @@
                                 <input id="account_no" class="form-control" type="text" name="account_no" value="{{Auth::guard('web')->user()->wallet_ltr}}" readonly>
                             </div>
                             <div class="form-group col-md-12">
-                                <label for="account_balance">LTR {{ __('label.checkout.account_balance') }}</label>
-                                <input id="account_balance" class="form-control" type="text" name="account_balance" value="{{number_format($balance)}}" readonly>
+                                <label for="ltr_account_balance">LTR {{ __('label.checkout.account_balance') }}</label>
+                                <input id="ltr_account_balance" class="form-control" type="text" name="ltr_account_balance" value="{{$ltr_balance}}" readonly>
+
+                            </div><div class="form-group col-md-12">
+                                <label for="eth_account_balance">ETH {{ __('label.checkout.account_balance') }}</label>
+                                <input id="eth_account_balance" class="form-control" type="text" name="eth_account_balance" value="{{$eth_balance}}" readonly>
                             </div>
+
+                            
 
                             <div class="form-group col-md-12">
                                 <label for="account_password">{{ __('label.checkout.password') }} - Carefully enter correct Password to Checkout. If Wrong Password, You will be log out automatically. </label>
