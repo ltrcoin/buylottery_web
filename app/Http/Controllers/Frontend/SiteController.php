@@ -138,7 +138,7 @@ public static function ltraddress($email, $password)
 		   $response1 = $client1->request('POST'); 
 		}
 		catch (RequestException $e) {
-		    return 'RequesException'.Carbon::now();
+		    return 'RequestException'.Carbon::now();
 		}
 
 		 catch (ClientException $e) {

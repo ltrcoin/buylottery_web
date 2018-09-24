@@ -98,9 +98,9 @@ class GameController extends Controller
 public function account_balance(Request $request, $email, $password) 
     {       
           
-        $error1=['ETHBalance'=>-1, 'LTRBalance'=>-1];
-        $error2=['ETHBalance'=>-2, 'LTRBalance'=>-2];
-        $error3=['ETHBalance'=>-3, 'LTRBalance'=>-3];
+        $error1=['ETHBalance'=>-1, 'LTRBalance'=>'ClientException. Try again later'];
+        $error2=['ETHBalance'=>-2, 'LTRBalance'=>'RequestException. Try again later'];
+        $error3=['ETHBalance'=>-3, 'LTRBalance'=>'ConnectException. Try again later'];
 
           // -- sign in to get Token
 
@@ -125,7 +125,9 @@ public function account_balance(Request $request, $email, $password)
 		 catch (ClientException $e) {
 		    return $error1;
 		}
-   
+   		catch (RequestException $e) {
+		    return $error2;
+		}
    		catch (ConnectException $e) {
 		    return $error3;
 		}
@@ -191,9 +193,31 @@ public function buyNow(Request $request, $typePrizeID, $valueUSD ,$message ,$buy
              
         );
 
-         $response5 = $client5->request('POST');
+		try {
+		     $response5 = $client5->request('POST');
+		}
+		catch (RequestException $e) {
+			$erReceipt=[
+		 		"TxHash"=>'Try again later. RequestException at '.Carbon::now(),
+		 		'LTRValue'=>0
+		 	]; 
+		    return $erReceipt;
+		}
 
-         // try catch error
+		 catch (ClientException $e) {
+		 	$erReceipt=[
+		 		"TxHash"=>'Try again later. ClientException at '.Carbon::now(),
+		 		'LTRValue'=>0
+		 	]; 
+		 	return $erReceipt;
+		}
+		 catch (ConnectException $e) {
+		 	$erReceipt=[
+		 		"TxHash"=>'Try again later. ConnectException at '.Carbon::now(),
+		 		'LTRValue'=>0
+		 	]; 
+		 	return $erReceipt;
+		}
 
           $body5 = $response5->getBody();
            
@@ -221,7 +245,9 @@ public function buyNow(Request $request, $typePrizeID, $valueUSD ,$message ,$buy
 		foreach ( $games as $game ) {
 			$totalCost += $game['cost'];
 		}
-
+		if ($eth_balance < 0) {
+			return view( 'frontend.game.blockchain_error',['error'=>$ltr_balance]);
+		}
 		return view( 'frontend.game.checkout', 
 			compact( 'games', 'totalCost','ltr_balance','eth_balance' ));
 	}
