@@ -28,7 +28,7 @@ class APISiteController extends Controller
 
     public function index()
     {
-    	// get all game
+        // get all game
         $list_game = Game::all();
 
         // get winning number
@@ -68,8 +68,17 @@ class APISiteController extends Controller
             'winnings' => $winnings
         ];
 
-    	return view("frontend.site.index", $data);
+        return view("frontend.site.index", $data);
     }
+    
+    public function gamesinfo()
+    {
+       
+    $list_game = Game::all();
+
+    return response()->json($list_game);
+    }
+
 
     public function login(Request $request) 
     {
@@ -136,16 +145,17 @@ class APISiteController extends Controller
         if(\Hash::check($userpassword, $customer->password)) 
         {
                 \Session::put('2fa:isLogged', $customer);
+                /*
                 if(!isset($customer->passwordSecurity) || !$customer->passwordSecurity->google2fa_enable) {
                     return redirect()->route('frontend.ps.show2faForm');
                 } else {
-                   
+                */
                     return response()->json([
                                             'status'=>200,
                                             'msg'=>'Login successfull',
                                             'data'=>$customer
                                             ]);
-                }
+                
             } else {
                 return response()->json([
                                         'status'=>401,
@@ -162,31 +172,69 @@ class APISiteController extends Controller
   
  public function apiregister(Request $request) 
     {
-        $customer = new Customer();
+       
+//-----Validate data------
+$validator = Validator::make($request->all(), [
+            //'fullname' => 'required|max:255',
+            'email' => 'required|email|unique:customers|max:255',
+            
+            //'wallet_btc' => 'required|unique:customers|max:150',
+            //'country' => 'required',
+            //'address' => 'max:255',
+            /*'portraitimage' => 'required',
+            'passportimage' => 'required',*/
+            'password' => 'required|max:255',
+            'tel' => 'required|unique:customers|max:50'
+            //'re_password' => 'required|max:255|same:password'
+        ])->setAttributeNames([
+            //'fullname' => 'Full Name',
+            'email' => 'email',
+            
+            //'wallet_btc' => 'Wallet BTC',
+            //'country' => 'Country',
+            //'address' => 'Address',
+            /*'portraitimage' => 'Portrait image',
+            'passportimage' => 'Passport image',*/
+            'password' => 'password',
+            'tel' => 'tel'
+            //'re_password' => 'Confirm password'
+        ]);
+if ($validator->fails()) {
+        return response()->json([
+                                    'status'=>422,
+                                    'msg'=>$validator->errors(),
+                                    'data'=>[]
+                                    ]);
 
-        $customer->fullname = $request->email;
-        $customer->email = $request->password;
+        }
 
-       $apikey=$request->apikey;    
+
+        //---------------
+
+
+
+
+      $customer = new Customer();
+      
+      $customer->email = $request->email;
+      $customer->password = bcrypt($request->password);
+      $apikey=$request->apikey;    
        
        if (!($apikey== env('ONESIGNAL_API_KEY'))) {
             return response()->json([
                                     'status'=>422,
-                                    'msg'=>'Invalid API Key',
+                                    'msg'=>'Invalid API Key ..',
                                     'data'=>[]
                                     ]);
         }; 
-
-   
-
+       
             $customer->fullname = $request->fullname;
-            $customer->email = $request->email;
-            $customer->password = bcrypt($request->password);
+            
             $customer->tel = $request->tel;
             $customer->wallet_btc=$request->wallet_btc;
-            //$customer->wallet_ltr=SiteController::ltraddress($customer->email, $customer->password);
+            $customer->wallet_ltr=SiteController::ltraddress($customer->email, $customer->password);
         
-            $customer->wallet_ltr='test upload $requets';
+            //$customer->wallet_ltr='test upload';
             
            
             $customer->dob = Carbon::parse($request->dob)->format('Y-m-d');
@@ -196,6 +244,24 @@ class APISiteController extends Controller
             $customer->address = $request->address;
             $customer->status = Customer::STATUS_ACTIVE;
 
+            
+
+
+             /*upload file to public/upload/profile*/
+            if ($request->hasFile('portraitimage')) {
+                $path = $request->file('portraitimage')->store(
+                    'profile/'.$request->email.date("Y",time()).'/'.date("m",time()).'/'.date("d",time()), 'upload'
+                );
+                $customer->portraitimage = 'upload/'.$path;
+            }
+            /*upload file to public/upload/profile*/
+            if ($request->hasFile('passportimage')) {
+                $path = $request->file('passportimage')->store(
+                    'profile/'.$request->email.date("Y",time()).'/'.date("m",time()).'/'.date("d",time()), 'upload'
+                );
+                $customer->passportimage = 'upload/'.$path;
+            }
+
     
        $customer->save();
 
@@ -203,9 +269,9 @@ class APISiteController extends Controller
      
        return response()->json([
                                'status'=>200,
-                               'msg'=>'Register successfully',
+                               'msg'=>'Register succesfully',
                                'data'=>[
-				   'wallet_ltr'=>$customer->wallet_ltr
+                   'wallet_ltr'=>$customer->wallet_ltr
 ]
                                ]);
            
@@ -214,32 +280,29 @@ class APISiteController extends Controller
 
 //--- end of api Register
 
-
-
-
     public function validateAjax(Request $request) {
         $validator = Validator::make($request->all(), [
-            'fullname' => 'required|max:255',
+            //'fullname' => 'required|max:255',
             'email' => 'required|email|unique:customers|max:255',
-            'tel' => 'required|unique:customers|max:50',
-            'wallet_btc' => 'required|unique:customers|max:150',
-            'country' => 'required',
-            'address' => 'max:255',
+            //'tel' => 'required|unique:customers|max:50',
+            //'wallet_btc' => 'required|unique:customers|max:150',
+            //'country' => 'required',
+            //'address' => 'max:255',
             /*'portraitimage' => 'required',
             'passportimage' => 'required',*/
             'password' => 'required|max:255',
-            're_password' => 'required|max:255|same:password'
+            //'re_password' => 'required|max:255|same:password'
         ])->setAttributeNames([
-            'fullname' => 'Full Name',
+            //'fullname' => 'Full Name',
             'email' => 'Email',
-            'tel' => 'Phone',
-            'wallet_btc' => 'Wallet BTC',
-            'country' => 'Country',
-            'address' => 'Address',
+            //'tel' => 'Phone',
+            //'wallet_btc' => 'Wallet BTC',
+            //'country' => 'Country',
+            //'address' => 'Address',
             /*'portraitimage' => 'Portrait image',
             'passportimage' => 'Passport image',*/
             'password' => 'Password',
-            're_password' => 'Confirm password'
+            //'re_password' => 'Confirm password'
         ]);
         if ($validator->fails()) {
             $response = [
@@ -252,7 +315,7 @@ class APISiteController extends Controller
                 'data' => ''
             ];
         }
-        return response()->json($response);
+        return $response;
     }
 
     public function error()
