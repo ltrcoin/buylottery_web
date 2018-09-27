@@ -18,7 +18,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
+Route::get('/gamesinfo', [
+            'as' => 'frontend.site.vapiLogin',
+            'uses'  => 'APISiteController@gamesinfo'
+        ]);
 
 Route::post('/login', [
 			'as' => 'frontend.site.vapiLogin',
