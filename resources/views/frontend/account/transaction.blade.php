@@ -48,10 +48,10 @@
 								</td>
 								<td>
 									<div>
-										@foreach(explode(',', $item->numbers) as $num)
+										@foreach(explode(' ', $item->numbers) as $num)
 					                    <span class="rs-number">{{$num}}</span>
 					                    @endforeach
-					                    @foreach(explode(',', $item->special_numbers) as $special)
+					                    @foreach(explode(' ', $item->special_numbers) as $special)
 					                    <span class="rs-number special">{{$special}}</span>
 					                    @endforeach
 				                  	</div>
