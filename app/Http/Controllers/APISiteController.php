@@ -79,6 +79,14 @@ class APISiteController extends Controller
     return response()->json($list_game);
     }
 
+     public function winningnumbersapi()
+    {
+       
+    $list_winning_numbers = WinningNumber::all();
+
+    return response()->json($list_winning_numbers);
+    }
+
 
     public function login(Request $request) 
     {
@@ -118,15 +126,15 @@ class APISiteController extends Controller
         
        $useremail=request('email');
        $userpassword=request('password');
-       $apikey=request('apikey');    
-       
-       if (!($apikey== env('ONESIGNAL_API_KEY'))) {
-            return response()->json([
+       $apikey=$request->apikey;  
+       $envapi=env('ONESIGNAL_API_KEY');   
+        if ( strcasecmp( $apikey, $envapi ) == 1 ){
+         return response()->json([
                                     'status'=>422,
-                                    'msg'=>'Invalid API Key',
-                                    'data'=>[]
+                                    'msg'=>'Invalid API Key ..',
+                                    'data'=>''
                                     ]);
-        };
+        }
        
        $credentials = [
                 'email' => $useremail, 
@@ -137,7 +145,7 @@ class APISiteController extends Controller
             return response()->json([
                                     'status'=>401,
                                     'msg'=>'Wrong email',
-                                    'data'=>[]
+                                    'data'=>''
                                     ]);
 
         }
@@ -149,7 +157,11 @@ class APISiteController extends Controller
                 if(!isset($customer->passwordSecurity) || !$customer->passwordSecurity->google2fa_enable) {
                     return redirect()->route('frontend.ps.show2faForm');
                 } else {
-                */
+                */  
+                    $customer->pkey='protected';
+                    $customer->password='protected';
+                    $customer->remember_token='protected';
+
                     return response()->json([
                                             'status'=>200,
                                             'msg'=>'Login successfull',
@@ -160,7 +172,7 @@ class APISiteController extends Controller
                 return response()->json([
                                         'status'=>401,
                                         'msg'=>'Wrong password',
-                                        'data'=>[]
+                                        'data'=>''
                                         ]);
             }
           
@@ -168,13 +180,24 @@ class APISiteController extends Controller
 
 //--- end of api login
 
-//------------------api Register
+//------------------api ValidateRegister
   
- public function apiregister(Request $request) 
+ public function validateregister(Request $request) 
     {
        
-//-----Validate data------
-$validator = Validator::make($request->all(), [
+       $apikey=$request->apikey;  
+       $envapi=env('ONESIGNAL_API_KEY');   
+        if ( strcasecmp( $apikey, $envapi ) == 1 ){
+         return response()->json([  'status'=>422,
+                                    'msg'=>'Invalid API Key',
+                                    'data'=>''
+                                    ]);
+        }
+
+        
+
+    //-----Validate data------
+        $validator = Validator::make($request->all(), [
             //'fullname' => 'required|max:255',
             'email' => 'required|email|unique:customers|max:255',
             
@@ -199,34 +222,87 @@ $validator = Validator::make($request->all(), [
             'tel' => 'tel'
             //'re_password' => 'Confirm password'
         ]);
-if ($validator->fails()) {
+    if ($validator->fails()) {
+    	$errors = $validator->errors();
+        return response()->json([ 'status'=>422,
+                                    'msg'=>[
+                                    		'email'=>$errors->first('email'),
+                                    		'password'=>$errors->first('password'),
+                                    		'tel'=>$errors->first('tel')
+                                    	],
+                                    'data'=>''
+                                    ]);
+                            
+        }
+      
+
+       return response()->json([
+                               'status'=>200,
+                               'msg'=>'Validation pass',
+                               'data'=>''
+                               ]);
+           
+          
+    }
+
+//--- end of api ValidateRegister
+
+
+//------------------api Register
+  
+ public function apiregister(Request $request) 
+    {
+       $apikey=$request->apikey;  
+       $envapi=env('ONESIGNAL_API_KEY');   
+        if ( strcasecmp( $apikey, $envapi ) == 1 ){
+         return response()->json([
+                                    'status'=>422,
+                                    'msg'=>'Invalid API Key ..',
+                                    'data'=>''
+                                    ]);
+        }
+       
+//-----Validate data------
+        $validator = Validator::make($request->all(), [
+            //'fullname' => 'required|max:255',
+            'email' => 'required|email|unique:customers|max:255',
+            
+            //'wallet_btc' => 'required|unique:customers|max:150',
+            //'country' => 'required',
+            //'address' => 'max:255',
+            /*'portraitimage' => 'required',
+            'passportimage' => 'required',*/
+            'password' => 'required|max:255',
+            'tel' => 'required|unique:customers|max:50'
+            //'re_password' => 'required|max:255|same:password'
+        ])->setAttributeNames([
+            //'fullname' => 'Full Name',
+            'email' => 'email',
+            
+            //'wallet_btc' => 'Wallet BTC',
+            //'country' => 'Country',
+            //'address' => 'Address',
+            /*'portraitimage' => 'Portrait image',
+            'passportimage' => 'Passport image',*/
+            'password' => 'password',
+            'tel' => 'tel'
+            //'re_password' => 'Confirm password'
+        ]);
+        if ($validator->fails()) {
         return response()->json([
                                     'status'=>422,
                                     'msg'=>$validator->errors(),
-                                    'data'=>[]
+                                    'data'=>''
                                     ]);
 
         }
-
-
-        //---------------
-
-
-
+        //---------
 
       $customer = new Customer();
       
       $customer->email = $request->email;
       $customer->password = bcrypt($request->password);
-      $apikey=$request->apikey;    
-       
-       if (!($apikey== env('ONESIGNAL_API_KEY'))) {
-            return response()->json([
-                                    'status'=>422,
-                                    'msg'=>'Invalid API Key ..',
-                                    'data'=>[]
-                                    ]);
-        }; 
+      
        
             $customer->fullname = $request->fullname;
             
@@ -243,9 +319,6 @@ if ($validator->fails()) {
             $customer->country =intval($request->country);
             $customer->address = $request->address;
             $customer->status = Customer::STATUS_ACTIVE;
-
-            
-
 
              /*upload file to public/upload/profile*/
             if ($request->hasFile('portraitimage')) {
@@ -265,14 +338,12 @@ if ($validator->fails()) {
     
        $customer->save();
 
-
-     
        return response()->json([
                                'status'=>200,
                                'msg'=>'Register succesfully',
                                'data'=>[
-                   'wallet_ltr'=>$customer->wallet_ltr
-]
+                                'wallet_ltr'=>$customer->wallet_ltr
+                                    ]
                                ]);
            
           
