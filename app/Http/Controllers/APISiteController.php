@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Models\Frontend\Game;
+use App\Http\Models\Frontend\Ticket;
+use App\Http\Controllers\Frontend\GameController;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Http\Controllers\FrontendController as Controller;
@@ -13,6 +15,9 @@ use App\Http\Models\Frontend\WinningNumber;
 use App\Http\Models\Frontend\Winner;
 use App\Http\Models\Frontend\Prize;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use App\Http\Controllers\Frontend\SiteController;
 use Illuminate\Support\Facades\Storage;
 
@@ -71,6 +76,327 @@ class APISiteController extends Controller
         return view("frontend.site.index", $data);
     }
     
+    public function getbalance(Request $request)
+    {
+       $useremail=request('email');
+       $userpassword=request('password');
+       $apikey=$request->apikey;  
+       $envapi=env('ONESIGNAL_API_KEY');   
+       if ( strcasecmp( $apikey, $envapi ) == 1 ){
+         return response()->json([
+                                    'status'=>422,
+                                    'msg'=>'Invalid API Key ..',
+                                    'data'=>''
+                                    ]);
+        }
+		$credentials = [
+                'email' => $useremail, 
+            ];
+             
+        $customer = Customer::where($credentials)->first();
+         if (!isset(($customer))) { 
+            return response()->json([
+                                    'status'=>401,
+                                    'msg'=>'Wrong email',
+                                    'data'=>''
+                                    ]);
+
+        }
+        if(\Hash::check($userpassword, $customer->password)) 
+        {
+
+          
+         //---------- call Hung API sign in de get Token chung ..
+
+          $ltr2='http://35.185.180.127:3000/api/signin';
+
+          $client2 = new Client([
+            
+             'base_uri' => $ltr2,               
+             'timeout'  => 9.0,
+             'form_params' => [
+                'email'=>$customer->email,
+                'password'=>$customer->password            
+                ]
+            ]);
+
+        try {
+		   $response2=$client2->request('POST');
+		  
+		} 
+		
+		 catch (ClientException $e) {
+		    return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ClientException',
+                                        'data'=>''
+                                        ]);
+		}
+   		catch (RequestException $e) {
+		     return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API RequestException',
+                                        'data'=>''
+                                        ]);
+		}
+   		catch (ConnectException $e) {
+		    return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ConnectException',
+                                        'data'=>''
+                                        ]);
+		}
+		
+          $body2 = $response2->getBody(true);
+          $json2 = json_decode($body2, true);      
+          $token='JWT '.$json2['token'];
+          // Luu token vao dau? Vao database remember token..
+          //--------------hoặc 
+          $ltr3='http://35.185.180.127:3000/api/getInfoWallet';
+
+          $client3 = new Client([
+            
+             'base_uri' => $ltr3,               
+             'timeout'  => 9.0,
+             'headers' => [
+                'Authorization'=>$token                          
+                ]
+            ]);
+
+		try {
+		   $response3 = $client3->request('GET');  
+		}
+		 catch (ClientException $e) {
+		    return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ClientException 2',
+                                        'data'=>''
+                                        ]);
+		}
+   		catch (RequestException $e) {
+		     return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API RequestException 2',
+                                        'data'=>''
+                                        ]);
+		}
+   		catch (ConnectException $e) {
+		    return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ConnectException 2',
+                                        'data'=>''
+                                        ]);
+		}
+		
+                  
+          $body3 = $response3->getBody();
+          
+          $json3 = json_decode($body3, true);          
+              
+       
+        
+             // return token cho APP.  cas API deu can dung 2 key, API key + Token
+
+                return response()->json([
+                                            'status'=>200,
+                                            'msg'=>'Successfully get balance',
+                                            'data'=>$json3
+                                            ]);
+                
+            } else {
+                return response()->json([
+                                        'status'=>401,
+                                        'msg'=>'Wrong password',
+                                        'data'=>''
+                                        ]);
+            }
+          
+    	}
+     
+
+
+    public function buytickets(Request $request)
+    {
+     
+     // Toan bo phan check ETH Balance, LTR balance la do APP thuc hien.
+     // Khi da check ok thi moi chuyen den buytickets API.
+     // data raw  
+	   
+    $ticketsraw = json_decode(request()->getContent(), true);
+
+    $useremail=$ticketsraw[0]['email'];
+    $userpassword=$ticketsraw[0]['password'];
+    $apikey=$ticketsraw[0]['apikey'];
+
+	$envapi=env('ONESIGNAL_API_KEY');   
+       if ( strcasecmp( $apikey, $envapi ) == 1 ){
+         return response()->json([
+                                    'status'=>402,
+                                    'msg'=>'Invalid API Key ..',
+                                    'data'=>''
+                                    ]);
+        }
+		$credentials = [
+                'email' => $useremail, 
+            ];
+             
+        $customer = Customer::where($credentials)->first();
+         if (!isset(($customer))) { 
+            return response()->json([
+                                    'status'=>401,
+                                    'msg'=>'Wrong email',
+                                    'data'=>''
+                                    ]);
+
+        }
+    if(\Hash::check($userpassword, $customer->password)) 
+        { 
+         //---------- call Hung API sign in de get Token chung ..
+
+          $ltr2='http://35.185.180.127:3000/api/signin';
+
+          $client2 = new Client([
+            
+             'base_uri' => $ltr2,               
+             'timeout'  => 9.0,
+             'form_params' => [
+                'email'=>$customer->email,
+                'password'=>$customer->password            
+                ]
+            ]);
+
+        try {
+		   $response2=$client2->request('POST');
+		  
+		} 
+		
+		 catch (ClientException $e) {
+		    return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ClientException 1',
+                                        'data'=>''
+                                        ]);
+		}
+   		catch (RequestException $e) {
+		     return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API RequestException 1',
+                                        'data'=>''
+                                        ]);
+		}
+   		catch (ConnectException $e) {
+		    return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ConnectException 1',
+                                        'data'=>''
+                                        ]);
+		}
+		
+          $body2 = $response2->getBody(true);
+          $json2 = json_decode($body2, true);      
+          $token='JWT '.$json2['token'];
+
+          $tickets=[];
+        		for ($i = 1; $i < count($ticketsraw); $i++) {
+			     
+			  $tickets[]=$ticketsraw[$i];
+			}
+
+    	 	
+		$typePrizeID=GameController::transFormGameIDToString($tickets);
+        $valueUSD=0.05; //$totalCost*$currenLTRUSDrate; 
+        $message=GameController::transFormTicketsToString($tickets);
+        $buyFrom='app';
+  
+		$ltr5='http://35.185.180.127:3000/api/BuyLotter';
+
+          $client5 = new Client([
+            
+             'base_uri' => $ltr5,               
+             'timeout'  => 9.0,
+             'headers' =>[ 
+   				'Authorization'=>$token
+           	 ],
+             'form_params' => [
+                'typePrizeID'=>$typePrizeID,
+                'valueUSD'=>$valueUSD,
+                'message'=>$message,
+                'buyFrom'=>$buyFrom          
+                ]
+            ]
+             
+        );
+
+		try {
+		     $response5 = $client5->request('POST');
+		}
+		catch (RequestException $e) {
+			return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API RequestException 2',
+                                        'data'=>''
+                                        ]);
+		}
+
+		 catch (ClientException $e) {
+		 	 return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ClientException 2',
+                                        'data'=>''
+                                        ]);
+		}
+		 catch (ConnectException $e) {
+		 	return response()->json([
+                                        'status'=>422,
+                                        'msg'=>'API ConnectException 2',
+                                        'data'=>''
+                                        ]);
+		}
+
+          $body5 = $response5->getBody();
+           
+          $receipt = json_decode($body5, true);
+          // insert txhash to tickets and save to database
+
+         $ticketsToSave = [];
+    
+            foreach ( $tickets as $ticket ) {
+               
+                    $ticketsToSave[] = [
+                        'game_id'         => $ticket['game_id'],
+                        'user_id'         => $ticket['user_id'],
+                        'numbers'         => $ticket['numbers'],
+                        'special_numbers' => $ticket['special_numbers'] ?? null,
+                        'price'           => $ticket['price'],
+                        'status'          => $ticket['status'],
+                        'created_at'      => Carbon::now(),
+                        'txhash'          => $receipt['TxHash']
+                    ];
+
+                }
+
+         Ticket::insert( $ticketsToSave);
+
+          // save tickets
+          return response()->json([
+                                        'status'=>200,
+                                        'msg'=>'Buy tickets successfully',
+                                        'data'=>$receipt
+                                        ]);
+
+                    
+        } else {
+                return response()->json([
+                                        'status'=>401,
+                                        'msg'=>'Wrong password',
+                                        'data'=>''
+                                        ]);
+            }
+       
+    }
+    
+    
+
     public function gamesinfo()
     {
        
@@ -152,15 +478,12 @@ class APISiteController extends Controller
 
         if(\Hash::check($userpassword, $customer->password)) 
         {
-                \Session::put('2fa:isLogged', $customer);
-                /*
-                if(!isset($customer->passwordSecurity) || !$customer->passwordSecurity->google2fa_enable) {
-                    return redirect()->route('frontend.ps.show2faForm');
-                } else {
-                */  
+        
                     $customer->pkey='protected';
                     $customer->password='protected';
                     $customer->remember_token='protected';
+                    // call Hung API sign in de get Token chung ..
+                    // return token cho APP.  cas API deu can dung 2 key, API key + Token
 
                     return response()->json([
                                             'status'=>200,
