@@ -27,24 +27,23 @@
 				<div class="content-box shadow bg-lgrey">
 					<table cellspacing="0" class="shop_table cart">
 						<thead>
-							<tr>
-								<th class="product-thumbnail">&nbsp;</th>
-								<th width="25%">Game</th>
-								<th width="45%">Numbers</th>
-								<th width="7%">Price</th>
+							<tr>						
+								<th width="15%">Game</th>
+								<th width="25%">TxHash</th>
+								<th width="40%">Numbers</th>
+								<th width="10%">Price</th>
 								<th width="15%">Purchase date</th>
 							</tr>
 						</thead>
 						<tbody>
 							@forelse($list_data as $item)
 							<tr class="cart_table_item">
-								<td class="product-thumbnail">
-									<a href="shop-product-sidebar.html">
-										<img width="100" height="100" alt="" class="img-responsive" src="{{(isset($item->game) && $item->game->image != '') ? $item->game->image : asset('frontend/images/default/product-thumb-01.jpg')}}">
-									</a>
-								</td>
 								<td>
 									<a href="{{ route('frontend.game.play', ['alias' => $item->game->alias]) }}">{{isset($item->game) ? $item->game->name : ''}}</a>
+								</td>
+								<td>
+									<a href="https://etherscan.io/tx/{{$item->txhash}}" target="_blank"> {{substr($item->txhash,0,25)}} </a>
+									
 								</td>
 								<td>
 									<div>
